@@ -4,6 +4,8 @@ from pandas import read_csv
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from matplotlib.gridspec import GridSpec
+import argparse
+import sys
 
 
 # ----------------------------------------------------------------------------------
@@ -474,9 +476,15 @@ class BB_log:
             size = os.path.getsize(self.path+'/'+t)
             if size>500000:
                 try:
-                    msg = os.system('blackbox_decode.exe' + ' '+t)
+                    if os.name == "posix":
+                        msg = os.system('blackbox_decode' + ' ' + self.path+'/'+t)
+                    else:
+                        msg = os.system('blackbox_decode.exe' + ' ' + self.path+'/'+t)
+                    if msg != 0:
+                        print("Error running blackbox_decode, you probably have to install it!")
+                        sys.exit(1)
                     loglist.append(t)
-                except:
+                except Exception:
                     print 'Error in Blackbox_decode'
             else:
                 os.remove(t)
@@ -496,11 +504,22 @@ def main():
           'to generate .csv files from your log.\n' \
           'Please put logfiles, Blackbox_decode.exe and this program into a single folder.\n'
 
-    while True:
-        file = raw_input("Place your log here: \n-->")
-        name = raw_input('\n Name for this plot: (optional)\n')
-        test = BB_log(str(file), str(name))
-        plt.show()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--logfiles', nargs='+', type=str)
+    args = parser.parse_args()
+
+    if args.logfiles:
+        if len(args.logfiles) > 1:
+            for logfile in args.logfiles:
+                BB_log(logfile, "")
+        else:
+            BB_log(args.logfiles[0], "")
+    else:
+        while True:
+            file = raw_input("Place your log here: \n-->")
+            name = raw_input('\n Name for this plot: (optional)\n')
+            test = BB_log(str(file), str(name))
+            plt.show()
 
 if __name__ == "__main__":
     main()
