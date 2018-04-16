@@ -350,7 +350,7 @@ class BB_log:
     def beheader(self, loglist):
         heads = []
         for i, bblog in enumerate(loglist):
-            log = open(self.path+'/'+bblog, 'r')
+            log = open(os.getcwd() + os.sep + bblog, 'r')
             lines = log.readlines()
 
             headsdict = {'tempFile'     :'',
@@ -454,12 +454,12 @@ class BB_log:
             csvlist.append(csvname)
             eventlist.append(eventname)
         for csv in csvlist:
-            csv_sizes.append(os.path.getsize(path+'/'+csv))
+            csv_sizes.append(os.path.getsize(path + os.sep + csv))
         return csvlist, csv_sizes, eventlist
 
     def decode(self, fpath):
-        log = open(fpath, 'rb')
-        log2 = open(fpath, 'r')
+        log = open(self.path + os.sep + fpath, 'rb')
+        log2 = open(self.path + os.sep + fpath, 'r')
         firstline = log2.readlines()[0]
         content = log.read()
 
@@ -473,13 +473,13 @@ class BB_log:
 
         loglist = []
         for t in temps:
-            size = os.path.getsize(self.path+'/'+t)
+            size = os.path.getsize(os.getcwd() + os.sep + t)
             if size>500000:
                 try:
                     if os.name == "posix":
-                        msg = os.system('blackbox_decode' + ' ' + self.path+'/'+t)
+                        msg = os.system('blackbox_decode' + ' ' + os.getcwd() + os.sep + t)
                     else:
-                        msg = os.system('blackbox_decode.exe' + ' ' + self.path+'/'+t)
+                        msg = os.system('blackbox_decode.exe' + ' ' + os.getcwd() + os.sep + t)
                     if msg != 0:
                         print("Error running blackbox_decode, you probably have to install it!")
                         sys.exit(1)
